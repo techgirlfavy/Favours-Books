@@ -1462,11 +1462,13 @@
       if (!file) return;
 
       const statusEl = document.getElementById("upload-status");
-      const label = document.querySelector(".upload-btn");
+      const label = document.querySelector(".btn-modal-confirm");
 
       statusEl.textContent = `Uploading ${file.name}…`;
-      label.style.opacity = "0.5";
-      label.style.pointerEvents = "none"; // disable while uploading
+      if (label) {
+        label.style.opacity = "0.5";
+        label.style.pointerEvents = "none"; // disable while uploading
+      }
 
       try {
         const folderId = document.getElementById("upload-folder-select").value || "";
@@ -1491,8 +1493,10 @@
         showToast("Upload failed: " + err.message);
         statusEl.textContent = "Upload failed.";
       } finally {
-        label.style.opacity = "1";
-        label.style.pointerEvents = "";
+        if (label) {
+          label.style.opacity = "1";
+          label.style.pointerEvents = "";
+        }
         event.target.value = ""; // reset so same file can be re-uploaded
       }
     }
