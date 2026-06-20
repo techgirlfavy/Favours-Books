@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eBook Library</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>    /* ─────────────────────────────────────────────
+       DESIGN TOKENS - Pink & White Minimalist
+    ───────────────────────────────────────────── */
+    :root {
+      --bg: #fafafa;
+      --s1: #ffffff;
+      --s2: #f8f8f8;
+      --s3: #f0f0f0;
+      --s4: #e8e8e8;
+      --b1: #e8d4d4;
+      --b2: #dfc4c4;
+      --b3: #d0b0b0;
+      --gold: #ff6b8a;
+      --gold-lt: #ff8fa7;
+      --gold-dk: #e84d6e;
+      --gold-bg: rgba(255,107,138,0.08);
+      --gold-glow: rgba(255,107,138,0.18);
+      --blue: #ffa5c3;
+      --blue-mid: #ff6b8a;
+      --blue-dim: #f0e8ec;
+      --t1: #2d2d2d;
+      --t2: #6b6b6b;
+      --t3: #a0a0a0;
+      --danger: #ff6b6b;
+      --r-xs: 8px;
+      --r-sm: 12px;
+      --r-md: 16px;
+      --r-lg: 24px;
+      --r-xl: 32px;
+      --sh-card: 0 2px 8px rgba(0,0,0,0.06);
+      --sh-hover: 0 12px 32px rgba(255,107,138,0.15);
+      --sh-gold: 0 0 0 1px rgba(255,107,138,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+
+    header {
+      position: sticky; top: 0; z-index: 100;
+      height: 64px;
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--b1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+
+    .logo-mark {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--gold-lt), var(--gold));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 4px 12px var(--gold-glow);
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--t1); letter-spacing: 0.3px;
+    }
+
+    .logo-text em { color: var(--gold); font-style: normal; }
+
+    .header-pill {
+      font-size: 0.75rem; letter-spacing: 0.6px;
+      color: var(--t3);
+      background: var(--s2);
+      border: 1px solid var(--b1);
+      padding: 0.35rem 0.95rem;
+      border-radius: 20px;
+    }
+
+    .layout {
+      display: flex;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      gap: 2.5rem;
+      align-items: flex-start;
+    }
+
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 90px;
+    }
+
+    .sidebar-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--t3);
+      margin-bottom: 0.8rem;
+      padding: 0 0.6rem;
+    }
+
+    .folder-item {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      margin-bottom: 4px;
+      position: relative;
+      transition: all 0.15s;
+      border: 1px solid transparent;
+    }
+
+    .folder-item:hover { 
+      background: var(--s2); 
+    }
+
+    .folder-item.active {
+      background: var(--blue-dim);
+      border-color: var(--b2);
+    }
+
+    .folder-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 20%; bottom: 20%;
+      width: 3px;
+      border-radius: 2px;
+      background: var(--gold);
+    }
+
+    .folder-icon {
+      font-size: 0.85rem;
+      opacity: 0.6;
+      flex-shrink: 0;
+      width: 16px;
+      text-align: center;
+    }
+
+    .folder-item.active .folder-icon { opacity: 1; }
+
+    .folder-label {
+      font-size: 0.85rem;
+      color: var(--t2);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .folder-item.active .folder-label { color: var(--gold); font-weight: 500; }
+
+    .folder-count {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--t3);
+      background: var(--s3);
+      border: 1px solid var(--b1);
+      padding: 2px 6px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      min-width: 22px;
+      text-align: center;
+    }
+
+    .folder-item.active .folder-count {
+      background: rgba(255,107,138,0.12);
+      border-color: rgba(255,107,138,0.25);
+      color: var(--gold);
+    }
+
+    .folder-action-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--t3);
+      cursor: pointer;
+      font-size: 0.7rem;
+      padding: 2px 5px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+
+    .folder-action-btn:hover { color: var(--danger); }
+    .folder-item:hover .folder-action-btn { display: block; }
+
+    .sidebar-divider {
+      height: 1px;
+      background: var(--b1);
+      margin: 1.2rem 0;
+    }
+
+    .new-folder-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      background: none;
+      border: 1px dashed var(--b2);
+      border-radius: var(--r-sm);
+      color: var(--t3);
+      font-size: 0.8rem;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.8rem;
+    }
+
+    .new-folder-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-bg);
+    }
+
+    .new-folder-input {
+      width: 100%;
+      padding: 0.55rem 0.8rem;
+      background: var(--s1);
+      border: 2px solid var(--gold);
+      border-radius: var(--r-sm);
+      color: var(--t1);
+      font-size: 0.8rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      margin-top: 0.5rem;
+      box-shadow: 0 0 0 3px var(--gold-bg);
+    }
+
+    .main { flex: 1; min-width: 0; }
+
+    .hero { margin-bottom: 2.2rem; }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.7rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px; height: 2px;
+      background: var(--gold);
+      border-radius: 1px;
+    }
+
+    .hero h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--t1);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 0.85rem;
+      color: var(--t2);
+      margin-top: 0.5rem;
+    }
+
+    .upload-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 2.5rem 2.2rem;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, rgba(255,107,138,0.04) 0%, rgba(255,161,195,0.04) 100%);
+      border: 2px solid var(--b1);
+      border-radius: var(--r-lg);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .upload-card:hover { 
+      border-color: var(--gold); 
+      box-shadow: 0 8px 24px rgba(255,107,138,0.1);
+    }
+
+    .upload-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(255,107,138,0.1) 0%, transparent 70%);
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .upload-left { width: 100%; }
+
+    .upload-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--t1);
+      margin-bottom: 0.3rem;
+    }
+
+    .upload-sub {
+      font-size: 0.8rem;
+      color: var(--t2);
+      margin-bottom: 1.2rem;
+    }
+
+    .upload-folder-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      font-size: 0.8rem;
+      color: var(--t2);
+      margin-bottom: 1rem;
+    }
+
+    .upload-folder-select {
+      padding: 0.4rem 0.8rem;
+      background: var(--s1);
+      border: 1.5px solid var(--b1);
+      border-radius: var(--r-sm);
+      color: var(--t1);
+      font-size: 0.8rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .upload-folder-select:focus { 
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-bg);
+    }
+
+    #file-input { display: none; }
+
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.5rem;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-lt) 100%);
+      color: #ffffff;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      transition: all 0.18s;
+      box-shadow: 0 4px 16px var(--gold-glow);
+      border: none;
+    }
+
+    .upload-btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px var(--gold-glow); 
+    }
+    .upload-btn:active { transform: translateY(0); }
+
+    .upload-status {
+      margin-top: 0.7rem;
+      font-size: 0.75rem;
+      color: var(--t3);
+    }
+
+    .upload-deco { display: none; }
+
+    .toolbar {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.95rem; top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .search-input,
+    .filter-select {
+      width: 100%;
+      padding: 0.65rem 1rem 0.65rem 2.5rem;
+      background: var(--s1);
+      border: 1.5px solid var(--b1);
+      border-radius: var(--r-sm);
+      color: var(--t1);
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: all 0.15s;
+    }
+
+    .search-input::placeholder { color: var(--t3); }
+
+    .search-input:focus,
+    .filter-select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-bg);
+    }
+
+    .filter-select { padding-left: 1rem; width: auto; min-width: 140px; cursor: pointer; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.4rem;
+      padding-bottom: 0.9rem;
+      border-bottom: 1px solid var(--b1);
+    }
+
+    .section-header-left { display: flex; align-items: center; gap: 0.7rem; }
+
+    .section-header-icon { font-size: 1.1rem; opacity: 0.6; }
+
+    .section-header-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--t1);
+    }
+
+    .section-header-count {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--t2);
+      background: var(--s2);
+      border: 1px solid var(--b1);
+      padding: 3px 10px;
+      border-radius: 10px;
+      letter-spacing: 0.3px;
+    }
+
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .book-card {
+      background: var(--s1);
+      border: 1px solid var(--b1);
+      border-radius: var(--r-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--sh-card);
+      transition: all 0.22s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    .book-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--gold);
+      box-shadow: var(--sh-hover), var(--sh-gold);
+    }
+
+    .book-cover {
+      height: 160px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .spine-binding {
+      width: 16px;
+      flex-shrink: 0;
+      background: rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .spine-binding::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 1px;
+      background: rgba(0,0,0,0.1);
+    }
+
+    .spine-face {
+      flex: 1;
+      padding: 0.85rem 0.8rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .spine-band {
+      height: 2.5px;
+      width: 24px;
+      border-radius: 1.5px;
+      background: var(--gold);
+      opacity: 0.85;
+    }
+
+    .spine-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.35;
+      margin-top: 0.4rem;
+      display: -webkit-box;
+      line-clamp: 3;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .spine-emoji {
+      font-size: 1.4rem;
+      margin-top: 0.4rem;
+      display: block;
+      opacity: 0.8;
+    }
+
+    .cover-folder-badge {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px);
+      color: rgba(255,255,255,0.6);
+      font-size: 0.58rem;
+      padding: 3px 7px;
+      border-radius: 5px;
+      max-width: 90px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .book-cover::after {
+      content: '';
+      position: absolute; inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.3;
+    }
+
+    .book-info {
+      padding: 0.85rem;
+      flex: 1;
+    }
+
+    .book-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--t1);
+      margin-bottom: 0.15rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .book-author {
+      font-size: 0.72rem;
+      color: var(--t2);
+      margin-bottom: 0.6rem;
+    }
+
+    .book-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .book-size {
+      font-size: 0.64rem;
+      color: var(--t3);
+      background: var(--s3);
+      border: 1px solid var(--b1);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    .book-ext {
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      opacity: 0.85;
+    }
+
+    .card-actions {
+      padding: 0.65rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .move-select {
+      width: 100%;
+      padding: 0.4rem 0.65rem;
+      background: var(--s2);
+      border: 1px solid var(--b1);
+      border-radius: var(--r-xs);
+      color: var(--t2);
+      font-size: 0.72rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .move-select:focus { 
+      border-color: var(--gold); 
+      box-shadow: 0 0 0 2px var(--gold-bg);
+    }
+
+    .card-btn-row { display: flex; gap: 0.4rem; }
+
+    .btn-download {
+      flex: 1;
+      padding: 0.5rem 0.6rem;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-lt) 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--r-xs);
+      cursor: pointer;
+      font-size: 0.76rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .btn-download:hover { 
+      transform: translateY(-1px);
+      box-shadow: 0 3px 12px var(--gold-glow);
+    }
+    .btn-download:active { transform: translateY(0); }
+
+    .btn-delete {
+      padding: 0.5rem 0.65rem;
+      background: transparent;
+      color: var(--t3);
+      border: 1px solid var(--b1);
+      border-radius: var(--r-xs);
+      cursor: pointer;
+      font-size: 0.76rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .btn-delete:hover {
+      background: rgba(255,107,138,0.08);
+      color: var(--danger);
+      border-color: rgba(255,107,138,0.25);
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+
+    .empty-state-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.2;
+      display: block;
+    }
+
+    .empty-state h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      color: var(--t2);
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+    }
+
+    .empty-state p {
+      font-size: 0.8rem;
+      color: var(--t3);
+      opacity: 0.7;
+    }
+
+    .loading-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem;
+      color: var(--t2);
+      font-size: 0.85rem;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      align-items: center; justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--s1);
+      border: 1px solid var(--b1);
+      border-radius: var(--r-lg);
+      padding: 2rem;
+      width: 360px;
+      max-width: 92vw;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    }
+
+    .modal h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--t1);
+      margin-bottom: 1.2rem;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 0.65rem 0.95rem;
+      background: var(--s2);
+      border: 1.5px solid var(--b1);
+      border-radius: var(--r-sm);
+      color: var(--t1);
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      margin-bottom: 1.2rem;
+      transition: all 0.15s;
+    }
+
+    .modal input:focus { 
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-bg);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.7rem;
+      justify-content: flex-end;
+    }
+
+    .btn-modal-cancel {
+      padding: 0.55rem 1.1rem;
+      background: transparent;
+      border: 1.5px solid var(--b1);
+      border-radius: var(--r-sm);
+      color: var(--t2);
+      font-size: 0.82rem;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-modal-cancel:hover { 
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-bg);
+    }
+
+    .btn-modal-confirm {
+      padding: 0.55rem 1.3rem;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-lt) 100%);
+      border: none;
+      border-radius: var(--r-sm);
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-modal-confirm:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px var(--gold-glow);
+    }
+    .btn-modal-confirm:active { transform: translateY(0); }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem; right: 1.5rem;
+      background: var(--s1);
+      border: 1px solid var(--b1);
+      color: var(--t1);
+      padding: 0.75rem 1.2rem;
+      border-radius: var(--r-sm);
+      font-size: 0.8rem;
+      font-family: 'Inter', sans-serif;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.22s, transform 0.22s;
+      pointer-events: none;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+      border-left: 3px solid var(--gold);
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 760px) {
+      .layout { flex-direction: column; padding: 1.5rem; gap: 1.5rem; }
+      .sidebar { width: 100%; position: static; }
+      .upload-card { flex-direction: column; gap: 0.8rem; }
+      .upload-deco { display: none; }
+      .hero h1 { font-size: 1.8rem; }
+      .books-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">📚</div>
+      <span class="logo-text">BookShare Hub</span>
+    </div>
+    <div class="header-pill" id="header-count">Loading…</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-label">Library</div>
+      <div class="folder-item active" id="folder-all" onclick="selectFolder('__all__')">
+        <span class="folder-icon">⊞</span>
+        <span class="folder-label">All Books</span>
+        <span class="folder-count" id="count-all">0</span>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">Folders</div>
+      <div id="folder-list"></div>
+      <button class="new-folder-btn" onclick="showNewFolderInput()">＋ New Folder</button>
+      <input class="new-folder-input" type="text" id="new-folder-input" placeholder="Folder name… press Enter"
+        style="display:none;" onkeydown="handleNewFolderKey(event)" onblur="cancelNewFolder()" />
+    </aside>
+
+    <main class="main">
+      <div class="hero">
+        <div class="hero-eyebrow">Your Collection</div>
+        <h1 id="page-title">All <span class="highlight">Books</span></h1>
+        <p id="page-subtitle">Every book in your library</p>
+      </div>
+
+      <div class="upload-card">
+        <div class="upload-left">
+          <div class="upload-title">Add a book to your shelf</div>
+          <div class="upload-sub">PDF, EPUB, DOCX, PPTX, XLSX, TXT and more — stored on your server</div>
+          <div class="upload-folder-row">
+            <span>Into:</span>
+            <select class="upload-folder-select" id="upload-folder-select"></select>
+          </div>
+          <label class="upload-btn" for="file-input">⬆ Choose File</label>
+          <input type="file" id="file-input"
+            accept=".pdf,.epub,.mobi,.txt,.docx,.doc,.pptx,.ppt,.xlsx,.xls,.csv,.md,.rtf,.odt,.odp,.ods"
+            onchange="handleUpload(event)" />
+          <p class="upload-status" id="upload-status">No file chosen</p>
+        </div>
+        <div class="upload-deco">📖</div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" type="text" id="search-input" placeholder="Search by title or author…"
+            oninput="renderBooks()" />
+        </div>
+        <select class="filter-select" id="filter-type" onchange="renderBooks()">
+          <option value="">All Types</option>
+          <option value="pdf">PDF</option>
+          <option value="epub">EPUB</option>
+          <option value="mobi">MOBI</option>
+          <option value="docx">DOCX</option>
+          <option value="doc">DOC</option>
+          <option value="pptx">PPTX</option>
+          <option value="ppt">PPT</option>
+          <option value="xlsx">XLSX</option>
+          <option value="xls">XLS</option>
+          <option value="csv">CSV</option>
+          <option value="txt">TXT</option>
+          <option value="md">MD</option>
+          <option value="rtf">RTF</option>
+        </select>
+      </div>
+
+      <div class="section-header">
+        <div class="section-header-left">
+          <span class="section-header-icon" id="folder-header-icon">⊞</span>
+          <span class="section-header-name" id="folder-header-name">All Books</span>
+        </div>
+        <span class="section-header-count" id="folder-header-count">0 books</span>
+      </div>
+
+      <div class="books-grid" id="books-grid">
+        <div class="loading-state">Loading your library…</div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="rename-modal">
+    <div class="modal">
+      <h3>Rename Folder</h3>
+      <input type="text" id="rename-input" placeholder="New folder name…" />
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closeRenameModal()">Cancel</button>
+        <button class="btn-modal-confirm" onclick="confirmRename()">Rename</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ═══════════════════════════════════════════
+    // API BASE URL
+    // Change this if your server runs on a different port/host.
+    // ═══════════════════════════════════════════ 
+    const API = window.location.origin + "/api";
+    // ═══════════════════════════════════════════
+    // APP STATE
+    // ═══════════════════════════════════════════
+    let books = [];
+    let folders = [];
+    let activeFolder = "__all__";
+    let renamingFolderId = null;
+
+
+    // ═══════════════════════════════════════════
+    // API HELPERS
+    // All API calls go through these wrappers so
+    // error handling is centralised in one place.
+    // ═══════════════════════════════════════════
+
+    async function apiFetch(path, options = {}) {
+      const res = await fetch(API + path, options);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Request failed");
+      return data;
+    }
+
+    async function apiGet(path) {
+      return apiFetch(path);
+    }
+
+    async function apiPost(path, body) {
+      return apiFetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+    }
+
+    async function apiPostForm(path, formData) {
+      // FormData upload — no Content-Type header (browser sets multipart boundary)
+      return apiFetch(path, { method: "POST", body: formData });
+    }
+
+    async function apiPatch(path, body) {
+      return apiFetch(path, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+    }
+
+    async function apiDelete(path) {
+      return apiFetch(path, { method: "DELETE" });
+    }
+
+
+    // ═══════════════════════════════════════════
+    // TOAST
+    // ═══════════════════════════════════════════
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2800);
+    }
+
+
+    // ═══════════════════════════════════════════
+    // UTILITIES
+    // ═══════════════════════════════════════════
+
+    function getFolderName(folderId) {
+      if (!folderId) return "Unfiled";
+      const f = folders.find(f => f.id === folderId);
+      return f ? f.name : "Unfiled";
+    }
+
+    function countInFolder(folderId) {
+      return books.filter(b => b.folderId === folderId).length;
+    }
+
+    // Returns emoji, cover colour, and binding colour based on file extension
+    function getFileMeta(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      const map = {
+        pdf: { emoji: "📕", color: "#1a0a20", binding: "#0d0615" },
+        epub: { emoji: "📗", color: "#0a1a12", binding: "#060d09" },
+        mobi: { emoji: "📘", color: "#0a1220", binding: "#060810" },
+        docx: { emoji: "📝", color: "#0d1a2e", binding: "#070f1c" },
+        doc: { emoji: "📝", color: "#0d1a2e", binding: "#070f1c" },
+        rtf: { emoji: "📄", color: "#1a1a0a", binding: "#0d0d06" },
+        odt: { emoji: "📄", color: "#1a1a0a", binding: "#0d0d06" },
+        pptx: { emoji: "📊", color: "#1e0f0a", binding: "#130a06" },
+        ppt: { emoji: "📊", color: "#1e0f0a", binding: "#130a06" },
+        odp: { emoji: "📊", color: "#1e0f0a", binding: "#130a06" },
+        xlsx: { emoji: "📈", color: "#0a1e0f", binding: "#06130a" },
+        xls: { emoji: "📈", color: "#0a1e0f", binding: "#06130a" },
+        csv: { emoji: "📈", color: "#0a1e0f", binding: "#06130a" },
+        ods: { emoji: "📈", color: "#0a1e0f", binding: "#06130a" },
+        txt: { emoji: "📃", color: "#1a1520", binding: "#0e0c14" },
+        md: { emoji: "🗒️", color: "#0f1520", binding: "#090e14" },
+      };
+      return map[ext] || { emoji: "📚", color: "#12101e", binding: "#0a0914" };
+    }
+
+
+    // ═══════════════════════════════════════════
+    // FOLDER MANAGEMENT
+    // ═══════════════════════════════════════════
+
+    async function createFolder(name) {
+      const trimmed = name.trim();
+      if (!trimmed) return;
+      try {
+        const newFolder = await apiPost("/folders", { name: trimmed });
+        folders.push(newFolder);
+        renderSidebar();
+        populateUploadFolderSelect();
+        showToast(`📁 Folder "${trimmed}" created!`);
+        selectFolder(newFolder.id);
+      } catch (err) {
+        showToast("⚠️ " + err.message);
+      }
+    }
+
+    async function deleteFolder(folderId, event) {
+      event.stopPropagation();
+      const folder = folders.find(f => f.id === folderId);
+      if (!folder) return;
+      if (!confirm(`Delete folder "${folder.name}"?\n\nBooks inside will become unfiled.`)) return;
+      try {
+        await apiDelete("/folders/" + folderId);
+        // Unfile affected books in local state
+        books = books.map(b => b.folderId === folderId ? { ...b, folderId: null } : b);
+        folders = folders.filter(f => f.id !== folderId);
+        if (activeFolder === folderId) selectFolder("__all__");
+        else { renderSidebar(); populateUploadFolderSelect(); renderBooks(); }
+        showToast("🗑 Folder deleted.");
+      } catch (err) {
+        showToast("⚠️ " + err.message);
+      }
+    }
+
+    function renameFolder(folderId, event) {
+      event.stopPropagation();
+      const folder = folders.find(f => f.id === folderId);
+      if (!folder) return;
+      renamingFolderId = folderId;
+      document.getElementById("rename-input").value = folder.name;
+      document.getElementById("rename-modal").classList.add("open");
+      document.getElementById("rename-input").focus();
+    }
+
+    function closeRenameModal() {
+      document.getElementById("rename-modal").classList.remove("open");
+      renamingFolderId = null;
+    }
+
+    async function confirmRename() {
+      const newName = document.getElementById("rename-input").value.trim();
+      if (!newName) return;
+      try {
+        await apiPatch("/folders/" + renamingFolderId, { name: newName });
+        folders = folders.map(f => f.id === renamingFolderId ? { ...f, name: newName } : f);
+        renderSidebar(); populateUploadFolderSelect(); renderBooks();
+        closeRenameModal();
+        showToast(`✏️ Renamed to "${newName}".`);
+      } catch (err) {
+        showToast("⚠️ " + err.message);
+      }
+    }
+
+    function showNewFolderInput() {
+      const input = document.getElementById("new-folder-input");
+      input.style.display = "block";
+      input.value = "";
+      input.focus();
+    }
+
+    function handleNewFolderKey(e) {
+      if (e.key === "Enter") {
+        const name = e.target.value.trim();
+        if (name) createFolder(name);
+        cancelNewFolder();
+      }
+      if (e.key === "Escape") cancelNewFolder();
+    }
+
+    function cancelNewFolder() {
+      setTimeout(() => {
+        const input = document.getElementById("new-folder-input");
+        input.style.display = "none";
+        input.value = "";
+      }, 150);
+    }
+
+
+    // ═══════════════════════════════════════════
+    // FOLDER SELECTION
+    // ═══════════════════════════════════════════
+
+    function selectFolder(folderId) {
+      activeFolder = folderId;
+      renderSidebar();
+      renderBooks();
+      updatePageHeader();
+    }
+
+    function updatePageHeader() {
+      const titleEl = document.getElementById("page-title");
+      const subtitleEl = document.getElementById("page-subtitle");
+      const iconEl = document.getElementById("folder-header-icon");
+      const nameEl = document.getElementById("folder-header-name");
+      if (activeFolder === "__all__") {
+        titleEl.innerHTML = 'All <span class="highlight">Books</span>';
+        subtitleEl.textContent = "Every book in your library";
+        iconEl.textContent = "⊞";
+        nameEl.textContent = "All Books";
+      } else {
+        const folder = folders.find(f => f.id === activeFolder);
+        const name = folder ? folder.name : "Folder";
+        titleEl.innerHTML = `<span class="highlight">${name}</span>`;
+        subtitleEl.textContent = "Books in this folder";
+        iconEl.textContent = "📁";
+        nameEl.textContent = name;
+      }
+    }
+
+
+    // ═══════════════════════════════════════════
+    // MOVE BOOK
+    // ═══════════════════════════════════════════
+
+    async function moveBook(bookId, newFolderId) {
+      const target = newFolderId === "" ? null : newFolderId;
+      try {
+        await apiPatch("/books/" + bookId, { folderId: target });
+        books = books.map(b => b.id === bookId ? { ...b, folderId: target } : b);
+        renderSidebar(); renderBooks();
+        showToast(`📁 Moved to "${target ? getFolderName(target) : "Unfiled"}".`);
+      } catch (err) {
+        showToast("⚠️ " + err.message);
+      }
+    }
+
+
+    // ═══════════════════════════════════════════
+    // FILE UPLOAD
+    //
+    // Uses FormData to send the file as multipart/form-data
+    // to POST /api/books — Multer handles it on the server.
+    // The upload button is disabled during the request to
+    // prevent duplicate submissions.
+    // ═══════════════════════════════════════════
+
+    async function handleUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById("upload-status");
+      const label = document.querySelector(".upload-btn");
+
+      statusEl.textContent = `Uploading ${file.name}…`;
+      label.style.opacity = "0.5";
+      label.style.pointerEvents = "none"; // disable while uploading
+
+      try {
+        const folderId = document.getElementById("upload-folder-select").value || "";
+        const form = new FormData();
+        form.append("file", file);
+        if (folderId) form.append("folderId", folderId);
+
+        const newBook = await apiPostForm("/books", form);
+
+        // Enrich the book object with local display metadata
+        // (server only stores file info; emoji and colours are client-side)
+        const meta = getFileMeta(file.name);
+        newBook.emoji = newBook.emoji || meta.emoji;
+        newBook.color = newBook.color || meta.color;
+        newBook.bindingColor = newBook.bindingColor || meta.binding;
+
+        books.unshift(newBook);
+        renderSidebar(); renderBooks();
+        showToast(`✅ "${newBook.title}" added to your shelf!`);
+        statusEl.textContent = `Saved: ${file.name}`;
+      } catch (err) {
+        showToast("⚠️ Upload failed: " + err.message);
+        statusEl.textContent = "Upload failed.";
+      } finally {
+        label.style.opacity = "1";
+        label.style.pointerEvents = "";
+        event.target.value = ""; // reset so same file can be re-uploaded
+      }
+    }
+
+
+    // ═══════════════════════════════════════════
+    // DOWNLOAD
+    //
+    // Opens the download endpoint in a hidden <a>
+    // tag — the server streams the file back with
+    // Content-Disposition: attachment, triggering
+    // the browser's native Save dialog.
+    // ═══════════════════════════════════════════
+
+    function downloadBook(id) {
+      const book = books.find(b => b.id === id);
+      if (!book) return;
+      const a = document.createElement("a");
+      a.href = `${API}/books/${id}/download`;
+      a.download = book.filename;
+      a.click();
+      showToast(`⬇ Downloading "${book.title}"…`);
+    }
+
+
+    // ═══════════════════════════════════════════
+    // DELETE BOOK
+    // ═══════════════════════════════════════════
+
+    async function deleteBook(id) {
+      try {
+        await apiDelete("/books/" + id);
+        books = books.filter(b => b.id !== id);
+        renderSidebar(); renderBooks();
+        showToast("🗑 Book removed from shelf.");
+      } catch (err) {
+        showToast("⚠️ " + err.message);
+      }
+    }
+
+
+    // ═══════════════════════════════════════════
+    // POPULATE UPLOAD FOLDER DROPDOWN
+    // ═══════════════════════════════════════════
+
+    function populateUploadFolderSelect() {
+      const sel = document.getElementById("upload-folder-select");
+      const current = sel.value;
+      sel.innerHTML =
+        '<option value="">📂 Unfiled</option>' +
+        folders.map(f => `<option value="${f.id}">📁 ${f.name}</option>`).join("");
+      if (current && folders.find(f => f.id === current)) sel.value = current;
+      if (activeFolder !== "__all__") sel.value = activeFolder;
+    }
+
+
+    // ═══════════════════════════════════════════
+    // RENDER SIDEBAR
+    // ═══════════════════════════════════════════
+
+    function renderSidebar() {
+      const list = document.getElementById("folder-list");
+      document.getElementById("count-all").textContent = books.length;
+      document.getElementById("folder-all").className =
+        "folder-item" + (activeFolder === "__all__" ? " active" : "");
+      list.innerHTML = folders.map(folder => {
+        const count = countInFolder(folder.id);
+        const isActive = activeFolder === folder.id;
+        return `
+          <div class="folder-item ${isActive ? "active" : ""}" onclick="selectFolder('${folder.id}')">
+            <span class="folder-icon">📁</span>
+            <span class="folder-label">${folder.name}</span>
+            <span class="folder-count">${count}</span>
+            <button class="folder-action-btn" title="Rename" onclick="renameFolder('${folder.id}', event)">✏️</button>
+            <button class="folder-action-btn" title="Delete"  onclick="deleteFolder('${folder.id}', event)">✕</button>
+          </div>`;
+      }).join("");
+      document.getElementById("header-count").textContent =
+        books.length + (books.length === 1 ? " book" : " books");
+    }
+
+
+    // ═══════════════════════════════════════════
+    // RENDER BOOKS GRID
+    // ═══════════════════════════════════════════
+
+    function renderBooks() {
+      const query = document.getElementById("search-input").value.toLowerCase();
+      const filterType = document.getElementById("filter-type").value;
+      let visible = activeFolder === "__all__"
+        ? books
+        : books.filter(b => b.folderId === activeFolder);
+      if (query) visible = visible.filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query));
+      if (filterType) visible = visible.filter(b => b.ext === filterType);
+
+      document.getElementById("folder-header-count").textContent =
+        visible.length + (visible.length === 1 ? " book" : " books");
+
+      const grid = document.getElementById("books-grid");
+      if (visible.length === 0) {
+        const isEmpty = books.length === 0;
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">${isEmpty ? "📭" : "🔍"}</div>
+            <h3>${isEmpty ? "Your shelf is empty" : "No books found"}</h3>
+            <p>${isEmpty ? "Upload a PDF, EPUB, MOBI, or TXT to get started." : "Try a different search or filter."}</p>
+          </div>`;
+        return;
+      }
+
+      const folderOptions =
+        '<option value="">📂 Unfiled</option>' +
+        folders.map(f => `<option value="${f.id}">📁 ${f.name}</option>`).join("");
+
+      grid.innerHTML = visible.map(book => `
+        <div class="book-card">
+          <div class="book-cover" style="background:${book.color}">
+            <div class="spine-binding" style="background:${book.bindingColor || '#1a0a30'}"></div>
+            <div class="spine-face">
+              <div class="spine-band"></div>
+              <div class="spine-title">${book.title}</div>
+              <span class="spine-emoji">${book.emoji}</span>
+            </div>
+            <span class="cover-folder-badge">📁 ${getFolderName(book.folderId)}</span>
+          </div>
+          <div class="book-info">
+            <div class="book-title" title="${book.title}">${book.title}</div>
+            <div class="book-author">${book.author}</div>
+            <div class="book-meta">
+              <span class="book-size">${book.size}</span>
+              <span class="book-ext">${book.ext}</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <select class="move-select" onchange="moveBook('${book.id}', this.value)">
+              ${folderOptions}
+            </select>
+            <div class="card-btn-row">
+              <button class="btn-download" onclick="downloadBook('${book.id}')">⬇ Download</button>
+              <button class="btn-delete"   onclick="deleteBook('${book.id}')">✕</button>
+            </div>
+          </div>
+        </div>`).join("");
+
+      // Set each card's move dropdown to the book's current folder
+      visible.forEach(book => {
+        document.querySelectorAll(".book-card").forEach(card => {
+          const dlBtn = card.querySelector(".btn-download");
+          if (dlBtn && dlBtn.getAttribute("onclick").includes(book.id)) {
+            const sel = card.querySelector(".move-select");
+            if (sel) sel.value = book.folderId || "";
+          }
+        });
+      });
+
+      updatePageHeader();
+    }
+
+
+    // ═══════════════════════════════════════════
+    // INIT — load data from the API then render
+    // ═══════════════════════════════════════════
+
+    async function init() {
+      try {
+        // Fetch folders and books from the server in parallel
+        [folders, books] = await Promise.all([
+          apiGet("/folders"),
+          apiGet("/books"),
+        ]);
+      } catch (err) {
+        // Show a user-friendly error if the server isn't running
+        document.getElementById("books-grid").innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">⚠️</div>
+            <h3>Cannot reach the server</h3>
+            <p>Make sure the backend is running: <strong>node server.js</strong></p>
+          </div>`;
+        document.getElementById("header-count").textContent = "Offline";
+        return;
+      }
+      renderSidebar();
+      populateUploadFolderSelect();
+      renderBooks();
+      updatePageHeader();
+    }
+
+    init();
+
+
+    // ═══════════════════════════════════════════
+    // MODAL LISTENERS
+    // ═══════════════════════════════════════════
+
+    document.getElementById("rename-modal").addEventListener("click", function (e) {
+      if (e.target === this) closeRenameModal();
+    });
+    document.getElementById("rename-input").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") confirmRename();
+      if (e.key === "Escape") closeRenameModal();
+    });
+  </script>
+</body>
+
+</html>

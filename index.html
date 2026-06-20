@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eBook Library</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* ─────────────────────────────────────────────
+      DESIGN TOKENS - Modern Pink & Teal Palette
+    ───────────────────────────────────────────── */
+    :root {
+     --bg: #f9f7fb;
+     --s1: #ffffff;
+     --s2: #f5f3f7;
+     --s3: #ece9f1;
+     --s4: #e3dfe8;
+     --primary: #ec4899;
+     --primary-lt: #f472b6;
+     --primary-dk: #be185d;
+     --primary-bg: rgba(236, 72, 153, 0.08);
+     --primary-glow: rgba(236, 72, 153, 0.15);
+     --accent: #14b8a6;
+     --accent-lt: #2dd4bf;
+     --accent-dk: #0d9488;
+     --accent-bg: rgba(20, 184, 166, 0.08);
+     --t1: #1f2937;
+     --t2: #6b7280;
+     --t3: #9ca3af;
+     --danger: #ef4444;
+     --success: #10b981;
+     --warning: #f59e0b;
+     --r-xs: 8px;
+     --r-sm: 12px;
+     --r-md: 16px;
+     --r-lg: 20px;
+     --r-xl: 28px;
+     --sh-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+     --sh-hover: 0 10px 30px rgba(236, 72, 153, 0.12);
+     --sh-focus: 0 0 0 3px rgba(236, 72, 153, 0.1);
+     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.dark-mode {
+      --bg: #0f111a;
+      --s1: #1a1c29;
+      --s2: #242736;
+      --s3: #2d3142;
+      --s4: #3f4458;
+      --t1: #f3f4f6;
+      --t2: #d1d5db;
+      --t3: #9ca3af;
+      --primary-bg: rgba(236, 72, 153, 0.15);
+      --sh-card: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes slideUp {
+     from {
+       opacity: 0;
+       transform: translateY(10px);
+     }
+     to {
+       opacity: 1;
+       transform: translateY(0);
+     }
+    }
+
+    @keyframes fadeIn {
+     from { opacity: 0; }
+     to { opacity: 1; }
+    }
+
+    @keyframes pulse {
+     0%, 100% { opacity: 1; }
+     50% { opacity: 0.5; }
+    }
+
+    @keyframes shimmer {
+     0% { background-position: -1000px 0; }
+     100% { background-position: 1000px 0; }
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 64px;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--s3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary-lt), var(--primary));
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 12px var(--primary-glow);
+      flex-shrink: 0;
+      color: white;
+      transition: var(--transition);
+    }
+
+    .logo-mark:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 16px var(--primary-glow);
+    }
+
+    .logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--t1);
+      letter-spacing: 0.3px;
+    }
+
+    .logo-text em {
+      color: var(--primary);
+      font-style: normal;
+    }
+
+    .header-pill {
+      font-size: 0.75rem;
+      letter-spacing: 0.6px;
+      color: var(--t3);
+      background: var(--s2);
+      border: 1px solid var(--s3);
+      padding: 0.35rem 0.95rem;
+      border-radius: 20px;
+    }
+
+    .layout {
+      display: flex;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      gap: 2.5rem;
+      align-items: flex-start;
+    }
+
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 90px;
+    }
+
+    .sidebar-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--t3);
+      margin-bottom: 0.8rem;
+      padding: 0 0.6rem;
+    }
+
+    .folder-item {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.7rem 0.9rem;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      margin-bottom: 6px;
+      position: relative;
+      transition: var(--transition);
+      border: 1px solid transparent;
+    }
+
+    .folder-item:hover {
+      background: var(--s2);
+      transform: translateX(2px);
+    }
+
+    .folder-item.active {
+      background: var(--primary-bg);
+      border-color: var(--primary);
+    }
+
+    .folder-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 20%;
+      bottom: 20%;
+      width: 3px;
+      border-radius: 2px;
+      background: var(--primary);
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .folder-icon {
+      font-size: 0.85rem;
+      opacity: 0.6;
+      flex-shrink: 0;
+      width: 16px;
+      text-align: center;
+    }
+
+    .folder-item.active .folder-icon {
+      opacity: 1;
+    }
+
+    .folder-label {
+      font-size: 0.85rem;
+      color: var(--t2);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .folder-item.active .folder-label {
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .folder-count {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--t3);
+      background: var(--s3);
+      border: 1px solid var(--s3);
+      padding: 2px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      min-width: 24px;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .folder-item.active .folder-count {
+      background: var(--primary-bg);
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .folder-action-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--t3);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 4px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      line-height: 1;
+      transition: var(--transition);
+    }
+
+    .folder-action-btn:hover {
+      color: var(--danger);
+      background: rgba(239, 68, 68, 0.08);
+      transform: scale(1.1);
+    }
+
+    .folder-item:hover .folder-action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-divider {
+      height: 1px;
+      background: var(--s3);
+      margin: 1.2rem 0;
+    }
+
+    .new-folder-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      background: none;
+      border: 1.5px dashed var(--s4);
+      border-radius: var(--r-sm);
+      color: var(--t3);
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 0.8rem;
+    }
+
+    .new-folder-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-bg);
+      transform: translateY(-1px);
+    }
+
+    .new-folder-input {
+      width: 100%;
+      padding: 0.7rem 0.95rem;
+      background: var(--s1);
+      border: 2px solid var(--primary);
+      border-radius: var(--r-sm);
+      color: var(--t1);
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      margin-top: 0.5rem;
+      box-shadow: var(--sh-focus);
+      transition: var(--transition);
+      animation: slideUp 0.2s ease-out;
+    }
+
+    .new-folder-input:focus {
+      border-color: var(--primary-dk);
+      box-shadow: 0 0 0 4px var(--primary-bg);
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero {
+      order: 1;
+      margin-bottom: 2.2rem;
+    }
+    
+    .toolbar { order: 3; }
+    .section-header { order: 4; }
+    .books-grid { order: 5; }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 0.7rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 1px;
+    }
+
+    .hero h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--t1);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-lt) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 0.85rem;
+      color: var(--t2);
+      margin-top: 0.5rem;
+    }
+
+    .upload-card {
+      order: 99;
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 2.8rem 2.8rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .upload-card.show-first {
+      order: 2;
+      margin-top: 0;
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.06) 0%, rgba(20, 184, 166, 0.06) 100%);
+      border: 2px solid var(--s3);
+      border-radius: var(--r-xl);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .upload-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--sh-hover);
+      transform: translateY(-2px);
+    }
+
+    .upload-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      opacity: 0.4;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .upload-left {
+      width: 100%;
+    }
+
+    .upload-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-sub {
+      font-size: 0.85rem;
+      color: var(--t2);
+      margin-bottom: 1.5rem;
+      max-width: 380px;
+      display:flex;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .upload-folder-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      font-size: 0.85rem;
+      color: var(--t2);
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+
+    .upload-folder-select {
+      padding: 0.6rem 0.9rem;
+      background: var(--s1);
+      border: 1.5px solid var(--s3);
+      border-radius: var(--r-sm);
+      color: var(--t1);
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .upload-folder-select:hover {
+      border-color: var(--primary);
+      background: var(--s2);
+    }
+
+    .upload-folder-select:focus {
+      border-color: var(--primary);
+      box-shadow: var(--sh-focus);
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.75rem 1.8rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-lt) 100%);
+      color: #ffffff;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px var(--primary-glow);
+      border: none;
+      position: relative;
+    }
+
+    .upload-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--primary-glow);
+    }
+
+    .upload-btn:active {
+      transform: translateY(0);
+    }
+
+    .upload-status {
+      margin-top: 0.7rem;
+      font-size: 0.75rem;
+      color: var(--t3);
+    }
+
+    .upload-deco {
+      display: none;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.95rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .search-input,
+    .filter-select {
+      width: 100%;
+      padding: 0.65rem 1rem 0.65rem 2.5rem;
+      background: var(--s1);
+      border: 1.5px solid var(--s3);
+      border-radius: var(--r-sm);
+      color: var(--t1);
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: all 0.15s;
+    }
+
+    .search-input::placeholder {
+      color: var(--t3);
+    }
+
+    .search-input:focus,
+    .filter-select:focus {
+      border-color: var(--primary);
+      box-shadow: var(--sh-focus);
+    }
+
+    .filter-select {
+      padding-left: 1rem;
+      width: auto;
+      min-width: 140px;
+      cursor: pointer;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.4rem;
+      padding-bottom: 0.9rem;
+      border-bottom: 1px solid var(--s3);
+    }
+
+    .section-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .section-header-icon {
+      font-size: 1.1rem;
+      opacity: 0.6;
+    }
+
+    .section-header-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--t1);
+    }
+
+    .section-header-count {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--t2);
+      background: var(--s2);
+      border: 1px solid var(--s3);
+      padding: 3px 10px;
+      border-radius: 10px;
+      letter-spacing: 0.3px;
+    }
+
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .book-card {
+      background: rgba(30, 30, 40, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+    }
+
+    .book-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--primary);
+      box-shadow: 0 15px 40px var(--primary-glow);
+    }
+
+    .book-cover {
+      height: 140px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .book-cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+      z-index: 1;
+    }
+
+    .book-cover::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.3;
+      z-index: 2;
+    }
+
+    .cover-icon-wrapper {
+      font-size: 3.5rem;
+      position: relative;
+      z-index: 3;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6));
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .book-card:hover .cover-icon-wrapper {
+      transform: scale(1.15) rotate(-4deg);
+    }
+
+    .cover-folder-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.65rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      z-index: 4;
+      max-width: 100px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .book-info {
+      padding: 1.2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0) 100%);
+    }
+
+    .book-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 0.3rem;
+      line-height: 1.35;
+      display: -webkit-box;
+      line-clamp: 2;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .book-author {
+      font-size: 0.75rem;
+      color: var(--t2);
+      margin-bottom: 0.8rem;
+    }
+
+    .book-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .book-size, .book-ext {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--t2);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .book-ext {
+      color: var(--primary-lt);
+      background: rgba(var(--primary-glow));
+      border-color: var(--primary);
+    }
+
+    .card-actions {
+      padding: 0 1.2rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .move-select {
+      width: 100%;
+      padding: 0.65rem 0.8rem;
+      background: var(--s2);
+      border: 1px solid var(--s3);
+      border-radius: 8px;
+      color: var(--t2);
+      font-size: 0.8rem;
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238b9bb4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.8rem center;
+      background-size: 14px;
+    }
+
+    .move-select:hover {
+      border-color: var(--primary);
+      background-color: var(--primary-bg);
+    }
+
+    .move-select:focus {
+      border-color: var(--primary);
+      box-shadow: var(--sh-focus);
+    }
+
+    .card-btn-row {
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    .btn-download {
+      flex: 1;
+      padding: 0.65rem 0;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-lt) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px var(--primary-glow);
+    }
+
+    .btn-delete {
+      padding: 0 0.9rem;
+      background: transparent;
+      color: var(--t3);
+      border: 1px solid var(--s3);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-delete:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+
+    .empty-state-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.2;
+      display: block;
+    }
+
+    .empty-state h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      color: var(--t2);
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+    }
+
+    .empty-state p {
+      font-size: 0.8rem;
+      color: var(--t3);
+      opacity: 0.7;
+    }
+
+    .loading-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem;
+      color: var(--t2);
+      font-size: 0.85rem;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--s1);
+      border: 1px solid var(--s3);
+      border-radius: var(--r-xl);
+      padding: 2.2rem;
+      width: 380px;
+      max-width: 92vw;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .modal h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 1.5rem;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--s2);
+      border: 1.5px solid var(--s3);
+      border-radius: var(--r-sm);
+      color: var(--t1);
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+    }
+
+    .modal input:focus {
+      border-color: var(--primary);
+      box-shadow: var(--sh-focus);
+      background: var(--s1);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: flex-end;
+    }
+
+    .btn-modal-cancel {
+      padding: 0.65rem 1.2rem;
+      background: transparent;
+      border: 1.5px solid var(--s3);
+      border-radius: var(--r-sm);
+      color: var(--t2);
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-modal-cancel:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-bg);
+      transform: translateY(-1px);
+    }
+
+    .btn-modal-confirm {
+      padding: 0.65rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-lt) 100%);
+      border: none;
+      border-radius: var(--r-sm);
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .btn-modal-confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px var(--primary-glow);
+    }
+
+    .btn-modal-confirm:active {
+      transform: translateY(0);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--s1);
+      border: 1px solid var(--s3);
+      color: var(--t1);
+      padding: 1rem 1.5rem;
+      border-radius: var(--r-md);
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      border-left: 4px solid var(--primary);
+      animation: slideUp 0.3s ease-out forwards;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 760px) {
+      .layout {
+        flex-direction: column;
+        padding: 1.5rem;
+        gap: 1.5rem;
+      }
+
+      .sidebar {
+        width: 100%;
+        position: static;
+      }
+
+      .upload-card {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .upload-deco {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+
+      .books-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark"><i class="fas fa-book"></i></div>
+      <span class="logo-text">Libraly Books</span>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode" style="background:none; border:none; color:var(--t2); font-size:1.2rem; cursor:pointer;"><i class="fas fa-moon" id="theme-icon"></i></button>
+      <div class="header-pill" id="header-count">Loading…</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-label">Library</div>
+      <div class="folder-item active" id="folder-all" onclick="selectFolder('__all__')">
+        <span class="folder-icon"><i class="fas fa-square"></i></span>
+        <span class="folder-label">All Books</span>
+        <span class="folder-count" id="count-all">0</span>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">Folders</div>
+      <div id="folder-list"></div>
+      <button class="new-folder-btn" onclick="showNewFolderInput()"><i class="fas fa-plus"></i> New Folder</button>
+      <input class="new-folder-input" type="text" id="new-folder-input" placeholder="Folder name… press Enter"
+        style="display:none;" onkeydown="handleNewFolderKey(event)" onblur="cancelNewFolder()" />
+    </aside>
+
+    <main class="main">
+      <div class="hero">
+        <div class="hero-eyebrow">Your Collection</div>
+        <h1 id="page-title">All <span class="highlight">Books</span></h1>
+        <p id="page-subtitle">Every book in your library</p>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon"><i class="fas fa-search"></i></span>
+          <input class="search-input" type="text" id="search-input" placeholder="Search by title or author…"
+            oninput="renderBooks()" />
+        </div>
+        <div style="display: flex; gap: 0.8rem; align-items: center;">
+          <select class="filter-select" id="filter-type" onchange="renderBooks()">
+            <option value="">All Types</option>
+            <option value="pdf">PDF</option>
+            <option value="epub">EPUB</option>
+            <option value="mobi">MOBI</option>
+            <option value="docx">DOCX</option>
+            <option value="doc">DOC</option>
+            <option value="pptx">PPTX</option>
+            <option value="ppt">PPT</option>
+            <option value="xlsx">XLSX</option>
+            <option value="xls">XLS</option>
+            <option value="csv">CSV</option>
+            <option value="txt">TXT</option>
+            <option value="md">MD</option>
+            <option value="rtf">RTF</option>
+          </select>
+          <button class="btn-modal-confirm" style="padding: 0.65rem 1.2rem; display: flex; align-items: center; gap: 0.5rem;" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload</button>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-header-left">
+          <span class="section-header-icon" id="folder-header-icon"><i class="fas fa-square"></i></span>
+          <span class="section-header-name" id="folder-header-name">All Books</span>
+        </div>
+        <span class="section-header-count" id="folder-header-count">0 books</span>
+      </div>
+
+      <div class="books-grid" id="books-grid">
+        <div class="loading-state">Loading your library…</div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="upload-modal">
+    <div class="modal">
+      <h3>Add a book</h3>
+      <p class="modal-sub">PDF, EPUB, DOCX, PPTX, XLSX, TXT and more — stored on your server</p>
+      <div class="upload-folder-row" style="margin-top:1rem; margin-bottom:1rem; display:flex; gap:0.5rem; align-items:center;">
+        <span>Into:</span>
+        <select class="upload-folder-select" id="upload-folder-select" style="flex:1; padding:0.5rem; border-radius:8px; border:1px solid var(--s3); background:var(--s2); color:var(--t1);"></select>
+      </div>
+      <label class="btn-modal-confirm" for="file-input" style="display:block; text-align:center; padding:0.8rem; cursor:pointer; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-lt) 100%); color:#fff; font-weight:600; border-radius:8px;"><i class="fas fa-upload"></i> Choose File</label>
+      <input type="file" id="file-input" accept=".pdf,.epub,.mobi,.txt,.docx,.doc,.pptx,.ppt,.xlsx,.xls,.csv,.md,.rtf,.odt,.odp,.ods" style="display:none;" onchange="handleUpload(event)" />
+      <p class="upload-status" id="upload-status" style="margin-top:1rem; font-size:0.85rem; color:var(--t2);">No file chosen</p>
+      <div class="modal-actions" style="margin-top: 1.5rem;">
+        <button class="btn-modal-cancel" onclick="closeUploadModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="rename-modal">
+    <div class="modal">
+      <h3>Rename Folder</h3>
+      <input type="text" id="rename-input" placeholder="New folder name…" />
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closeRenameModal()">Cancel</button>
+        <button class="btn-modal-confirm" onclick="confirmRename()">Rename</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      const icon = document.getElementById('theme-icon');
+      if (document.body.classList.contains('dark-mode')) {
+        icon.classList.replace('fa-moon', 'fa-sun');
+      } else {
+        icon.classList.replace('fa-sun', 'fa-moon');
+      }
+    }
+
+    function openUploadModal() {
+      document.getElementById('upload-modal').classList.add('open');
+    }
+
+    function closeUploadModal() {
+      document.getElementById('upload-modal').classList.remove('open');
+      document.getElementById('upload-status').textContent = "No file chosen";
+      document.getElementById('file-input').value = "";
+    }
+
+    // ═══════════════════════════════════════════
+    // API BASE URL
+    // Change this if your server runs on a different port/host.
+    // ═══════════════════════════════════════════ 
+    const API = window.location.origin + "/api";
+    // ═══════════════════════════════════════════
+    // APP STATE
+    // ═══════════════════════════════════════════
+    let books = [];
+    let folders = [];
+    let activeFolder = "__all__";
+    let renamingFolderId = null;
+
+
+    // ═══════════════════════════════════════════
+    // API HELPERS
+    // All API calls go through these wrappers so
+    // error handling is centralised in one place.
+    // ═══════════════════════════════════════════
+
+    async function apiFetch(path, options = {}) {
+      const res = await fetch(API + path, options);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Request failed");
+      return data;
+    }
+
+    async function apiGet(path) {
+      return apiFetch(path);
+    }
+
+    async function apiPost(path, body) {
+      return apiFetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+    }
+
+    async function apiPostForm(path, formData) {
+      // FormData upload — no Content-Type header (browser sets multipart boundary)
+      return apiFetch(path, { method: "POST", body: formData });
+    }
+
+    async function apiPatch(path, body) {
+      return apiFetch(path, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+    }
+
+    async function apiDelete(path) {
+      return apiFetch(path, { method: "DELETE" });
+    }
+
+
+    // ═══════════════════════════════════════════
+    // TOAST
+    // ═══════════════════════════════════════════
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.innerHTML = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2800);
+    }
+
+
+    // ═══════════════════════════════════════════
+    // UTILITIES
+    // ═══════════════════════════════════════════
+
+    function getFolderName(folderId) {
+      if (!folderId) return "Unfiled";
+      const f = folders.find(f => f.id === folderId);
+      return f ? f.name : "Unfiled";
+    }
+
+    function countInFolder(folderId) {
+      return books.filter(b => b.folderId === folderId).length;
+    }
+
+    // Returns emoji, cover colour, and binding colour based on file extension
+    function getFileMeta(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      const map = {
+        pdf: { emoji: '<i class="fas fa-book" style="color: #991b1b"></i>', color: "#1a0a20", binding: "#0d0615" },
+        epub: { emoji: '<i class="fas fa-book" style="color: #15803d"></i>', color: "#0a1a12", binding: "#060d09" },
+        mobi: { emoji: '<i class="fas fa-book" style="color: #1e40af"></i>', color: "#0a1220", binding: "#060810" },
+        docx: { emoji: '<i class="fas fa-file-alt" style="color: #ea580c"></i>', color: "#0d1a2e", binding: "#070f1c" },
+        doc: { emoji: '<i class="fas fa-file-alt" style="color: #ea580c"></i>', color: "#0d1a2e", binding: "#070f1c" },
+        rtf: { emoji: '<i class="fas fa-file" style="color: #78350f"></i>', color: "#1a1a0a", binding: "#0d0d06" },
+        odt: { emoji: '<i class="fas fa-file" style="color: #78350f"></i>', color: "#1a1a0a", binding: "#0d0d06" },
+        pptx: { emoji: '<i class="fas fa-chart-bar" style="color: #9f1239"></i>', color: "#1e0f0a", binding: "#130a06" },
+        ppt: { emoji: '<i class="fas fa-chart-bar" style="color: #9f1239"></i>', color: "#1e0f0a", binding: "#130a06" },
+        odp: { emoji: '<i class="fas fa-chart-bar" style="color: #9f1239"></i>', color: "#1e0f0a", binding: "#130a06" },
+        xlsx: { emoji: '<i class="fas fa-chart-line" style="color: #065f46"></i>', color: "#0a1e0f", binding: "#06130a" },
+        xls: { emoji: '<i class="fas fa-chart-line" style="color: #065f46"></i>', color: "#0a1e0f", binding: "#06130a" },
+        csv: { emoji: '<i class="fas fa-chart-line" style="color: #065f46"></i>', color: "#0a1e0f", binding: "#06130a" },
+        ods: { emoji: '<i class="fas fa-chart-line" style="color: #065f46"></i>', color: "#0a1e0f", binding: "#06130a" },
+        txt: { emoji: '<i class="fas fa-file-lines" style="color: #44546f"></i>', color: "#1a1520", binding: "#0e0c14" },
+        md: { emoji: '<i class="fas fa-sticky-note" style="color: #4c5f8f"></i>', color: "#0f1520", binding: "#090e14" },
+      };
+      return map[ext] || { emoji: "📚", color: "#12101e", binding: "#0a0914" };
+    }
+
+
+    // ═══════════════════════════════════════════
+    // FOLDER MANAGEMENT
+    // ═══════════════════════════════════════════
+
+    async function createFolder(name) {
+      const trimmed = name.trim();
+      if (!trimmed) return;
+      try {
+        const newFolder = await apiPost("/folders", { name: trimmed });
+        folders.push(newFolder);
+        renderSidebar();
+        populateUploadFolderSelect();
+        showToast(`<i class="fas fa-folder"></i> Folder "${trimmed}" created!`);
+        selectFolder(newFolder.id);
+      } catch (err) {
+        showToast("Error creating folder: " + err.message);
+      }
+    }
+
+    async function deleteFolder(folderId, event) {
+      event.stopPropagation();
+      const folder = folders.find(f => f.id === folderId);
+      if (!folder) return;
+      if (!confirm(`Delete folder "${folder.name}"?\n\nBooks inside will become unfiled.`)) return;
+      try {
+        await apiDelete("/folders/" + folderId);
+        // Unfile affected books in local state
+        books = books.map(b => b.folderId === folderId ? { ...b, folderId: null } : b);
+        folders = folders.filter(f => f.id !== folderId);
+        if (activeFolder === folderId) selectFolder("__all__");
+        else { renderSidebar(); populateUploadFolderSelect(); renderBooks(); }
+        showToast("Folder deleted successfully.");
+      } catch (err) {
+        showToast("Error deleting folder: " + err.message);
+      }
+    }
+
+    function renameFolder(folderId, event) {
+      event.stopPropagation();
+      const folder = folders.find(f => f.id === folderId);
+      if (!folder) return;
+      renamingFolderId = folderId;
+      document.getElementById("rename-input").value = folder.name;
+      document.getElementById("rename-modal").classList.add("open");
+      document.getElementById("rename-input").focus();
+    }
+
+    function closeRenameModal() {
+      document.getElementById("rename-modal").classList.remove("open");
+      renamingFolderId = null;
+    }
+
+    async function confirmRename() {
+      const newName = document.getElementById("rename-input").value.trim();
+      if (!newName) return;
+      try {
+        await apiPatch("/folders/" + renamingFolderId, { name: newName });
+        folders = folders.map(f => f.id === renamingFolderId ? { ...f, name: newName } : f);
+        renderSidebar(); populateUploadFolderSelect(); renderBooks();
+        closeRenameModal();
+        showToast(`<i class="fas fa-edit"></i> Renamed to "${newName}".`);
+      } catch (err) {
+        showToast("Error renaming folder: " + err.message);
+      }
+    }
+
+    function showNewFolderInput() {
+      const input = document.getElementById("new-folder-input");
+      input.style.display = "block";
+      input.value = "";
+      input.focus();
+    }
+
+    function handleNewFolderKey(e) {
+      if (e.key === "Enter") {
+        const name = e.target.value.trim();
+        if (name) createFolder(name);
+        cancelNewFolder();
+      }
+      if (e.key === "Escape") cancelNewFolder();
+    }
+
+    function cancelNewFolder() {
+      setTimeout(() => {
+        const input = document.getElementById("new-folder-input");
+        input.style.display = "none";
+        input.value = "";
+      }, 150);
+    }
+
+
+    // ═══════════════════════════════════════════
+    // FOLDER SELECTION
+    // ═══════════════════════════════════════════
+
+    function selectFolder(folderId) {
+      activeFolder = folderId;
+      renderSidebar();
+      renderBooks();
+      updatePageHeader();
+    }
+
+    function updatePageHeader() {
+      const titleEl = document.getElementById("page-title");
+      const subtitleEl = document.getElementById("page-subtitle");
+      const iconEl = document.getElementById("folder-header-icon");
+      const nameEl = document.getElementById("folder-header-name");
+      if (activeFolder === "__all__") {
+        titleEl.innerHTML = 'All <span class="highlight">Books</span>';
+        subtitleEl.textContent = "Every book in your library";
+        iconEl.innerHTML = '<i class="fas fa-square"></i>';
+        nameEl.textContent = "All Books";
+      } else {
+        const folder = folders.find(f => f.id === activeFolder);
+        const name = folder ? folder.name : "Folder";
+        titleEl.innerHTML = `<span class="highlight">${name}</span>`;
+        subtitleEl.textContent = "Books in this folder";
+        iconEl.innerHTML = '<i class="fas fa-folder"></i>';
+        nameEl.textContent = name;
+      }
+    }
+
+
+    // ═══════════════════════════════════════════
+    // MOVE BOOK
+    // ═══════════════════════════════════════════
+
+    async function moveBook(bookId, newFolderId) {
+      const target = newFolderId === "" ? null : newFolderId;
+      try {
+        await apiPatch("/books/" + bookId, { folderId: target });
+        books = books.map(b => b.id === bookId ? { ...b, folderId: target } : b);
+        renderSidebar(); renderBooks();
+        showToast(`<i class="fas fa-folder"></i> Moved to "${target ? getFolderName(target) : "Unfiled"}".`);
+      } catch (err) {
+        showToast("Error moving book: " + err.message);
+      }
+    }
+
+
+    // ═══════════════════════════════════════════
+    // FILE UPLOAD
+    //
+    // Uses FormData to send the file as multipart/form-data
+    // to POST /api/books — Multer handles it on the server.
+    // The upload button is disabled during the request to
+    // prevent duplicate submissions.
+    // ═══════════════════════════════════════════
+
+    async function handleUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById("upload-status");
+      const label = document.querySelector(".upload-btn");
+
+      statusEl.textContent = `Uploading ${file.name}…`;
+      label.style.opacity = "0.5";
+      label.style.pointerEvents = "none"; // disable while uploading
+
+      try {
+        const folderId = document.getElementById("upload-folder-select").value || "";
+        const form = new FormData();
+        form.append("file", file);
+        if (folderId) form.append("folderId", folderId);
+
+        const newBook = await apiPostForm("/books", form);
+
+        // Enrich the book object with local display metadata
+        // (server only stores file info; emoji and colours are client-side)
+        const meta = getFileMeta(file.name);
+        newBook.emoji = newBook.emoji || meta.emoji;
+        newBook.color = newBook.color || meta.color;
+        newBook.bindingColor = newBook.bindingColor || meta.binding;
+
+        books.unshift(newBook);
+        renderSidebar(); renderBooks();
+        showToast(`✅ "${newBook.title}" added to your shelf!`);
+        statusEl.textContent = `Saved: ${file.name}`;
+      } catch (err) {
+        showToast("Upload failed: " + err.message);
+        statusEl.textContent = "Upload failed.";
+      } finally {
+        label.style.opacity = "1";
+        label.style.pointerEvents = "";
+        event.target.value = ""; // reset so same file can be re-uploaded
+      }
+    }
+
+
+    // ═══════════════════════════════════════════
+    // DOWNLOAD
+    //
+    // Opens the download endpoint in a hidden <a>
+    // tag — the server streams the file back with
+    // Content-Disposition: attachment, triggering
+    // the browser's native Save dialog.
+    // ═══════════════════════════════════════════
+
+    function downloadBook(id) {
+      const book = books.find(b => b.id === id);
+      if (!book) return;
+      const a = document.createElement("a");
+      a.href = `${API}/books/${id}/download`;
+      a.download = book.filename;
+      a.click();
+      showToast(`<i class="fas fa-download"></i> Downloading "${book.title}"…`);
+    }
+
+
+    // ═══════════════════════════════════════════
+    // DELETE BOOK
+    // ═══════════════════════════════════════════
+
+    async function deleteBook(id) {
+      try {
+        await apiDelete("/books/" + id);
+        books = books.filter(b => b.id !== id);
+        renderSidebar(); renderBooks();
+        showToast("Book removed from library.");
+      } catch (err) {
+        showToast("Error deleting book: " + err.message);
+      }
+    }
+
+
+    // ═══════════════════════════════════════════
+    // POPULATE UPLOAD FOLDER DROPDOWN
+    // ═══════════════════════════════════════════
+
+    function populateUploadFolderSelect() {
+      const sel = document.getElementById("upload-folder-select");
+      const current = sel.value;
+      sel.innerHTML =
+        '<option value="">Unfiled</option>' +
+        folders.map(f => `<option value="${f.id}">${f.name}</option>`).join("");
+      if (current && folders.find(f => f.id === current)) sel.value = current;
+      if (activeFolder !== "__all__") sel.value = activeFolder;
+    }
+
+
+    // ═══════════════════════════════════════════
+    // RENDER SIDEBAR
+    // ═══════════════════════════════════════════
+
+    function renderSidebar() {
+      const list = document.getElementById("folder-list");
+      document.getElementById("count-all").textContent = books.length;
+      document.getElementById("folder-all").className =
+        "folder-item" + (activeFolder === "__all__" ? " active" : "");
+      list.innerHTML = folders.map(folder => {
+        const count = countInFolder(folder.id);
+        const isActive = activeFolder === folder.id;
+        return `
+          <div class="folder-item ${isActive ? "active" : ""}" onclick="selectFolder('${folder.id}')">
+            <span class="folder-icon"><i class="fas fa-folder"></i></span>
+            <span class="folder-label">${folder.name}</span>
+            <span class="folder-count">${count}</span>
+            <button class="folder-action-btn" title="Rename" onclick="renameFolder('${folder.id}', event)"><i class="fas fa-edit"></i></button>
+            <button class="folder-action-btn" title="Delete"  onclick="deleteFolder('${folder.id}', event)"><i class="fas fa-times"></i></button>
+          </div>`;
+      }).join("");
+      document.getElementById("header-count").textContent =
+        books.length + (books.length === 1 ? " book" : " books");
+    }
+
+
+    // ═══════════════════════════════════════════
+    // RENDER BOOKS GRID
+    // ═══════════════════════════════════════════
+
+    function renderBooks() {
+      const query = document.getElementById("search-input").value.toLowerCase();
+      const filterType = document.getElementById("filter-type").value;
+      
+      let visible = activeFolder === "__all__"
+        ? books
+        : books.filter(b => b.folderId === activeFolder);
+      if (query) visible = visible.filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query));
+      if (filterType) visible = visible.filter(b => b.ext === filterType);
+
+      document.getElementById("folder-header-count").textContent =
+        visible.length + (visible.length === 1 ? " book" : " books");
+
+      const grid = document.getElementById("books-grid");
+      if (visible.length === 0) {
+        const isEmpty = books.length === 0;
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">${isEmpty ? '<i class="fas fa-inbox"></i>' : '<i class="fas fa-search"></i>'}</div>
+            <h3>${isEmpty ? "Your shelf is empty" : "No books found"}</h3>
+            <p>${isEmpty ? "Upload a PDF, EPUB, MOBI, or TXT to get started." : "Try a different search or filter."}</p>
+            ${isEmpty ? '<button class="btn-modal-confirm" style="margin-top: 1.5rem; padding: 0.8rem 1.2rem; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center;" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload Book</button>' : ''}
+          </div>`;
+        return;
+      }
+
+      const folderOptions =
+        '<option value="">Unfiled</option>' +
+        folders.map(f => `<option value="${f.id}">${f.name}</option>`).join("");
+
+      grid.innerHTML = visible.map(book => `
+        <div class="book-card">
+          <div class="book-cover" style="background:${book.color}">
+            <div class="cover-icon-wrapper">
+              ${book.emoji}
+            </div>
+            <span class="cover-folder-badge"><i class="fas fa-folder"></i> ${getFolderName(book.folderId)}</span>
+          </div>
+          <div class="book-info">
+            <div class="book-title" title="${book.title}">${book.title}</div>
+            <div class="book-author">${book.author}</div>
+            <div class="book-meta">
+              <span class="book-ext">${book.ext}</span>
+              <span class="book-size">${book.size}</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <select class="move-select" onchange="moveBook('${book.id}', this.value)">
+              ${folderOptions}
+            </select>
+            <div class="card-btn-row">
+              <button class="btn-download" onclick="downloadBook('${book.id}')"><i class="fas fa-download"></i> Download</button>
+              <button class="btn-delete" title="Delete" onclick="deleteBook('${book.id}')"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+        </div>`).join("");
+
+      // Set each card's move dropdown to the book's current folder
+      visible.forEach(book => {
+        document.querySelectorAll(".book-card").forEach(card => {
+          const dlBtn = card.querySelector(".btn-download");
+          if (dlBtn && dlBtn.getAttribute("onclick").includes(book.id)) {
+            const sel = card.querySelector(".move-select");
+            if (sel) sel.value = book.folderId || "";
+          }
+        });
+      });
+
+      updatePageHeader();
+    }
+
+
+    // ═══════════════════════════════════════════
+    // INIT — load data from the API then render
+    // ═══════════════════════════════════════════
+
+    async function init() {
+      try {
+        // Fetch folders and books from the server in parallel
+        [folders, books] = await Promise.all([
+          apiGet("/folders"),
+          apiGet("/books"),
+        ]);
+      } catch (err) {
+        // Show a user-friendly error if the server isn't running
+        document.getElementById("books-grid").innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-inbox"></i></div>
+            <h3>Cannot reach the server</h3>
+            <p>Make sure the backend is running: <strong>node server.js</strong></p>
+          </div>`;
+        document.getElementById("header-count").textContent = "Offline";
+        return;
+      }
+      renderSidebar();
+      populateUploadFolderSelect();
+      renderBooks();
+      updatePageHeader();
+    }
+
+    init();
+
+
+    // ═══════════════════════════════════════════
+    // MODAL LISTENERS
+    // ═══════════════════════════════════════════
+
+    document.getElementById("rename-modal").addEventListener("click", function (e) {
+      if (e.target === this) closeRenameModal();
+    });
+    document.getElementById("rename-input").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") confirmRename();
+      if (e.key === "Escape") closeRenameModal();
+    });
+  </script>
+</body>
+
+</html>
